@@ -36,38 +36,22 @@
         <div id="taskList"></div>
         <div class="progress" id="progress"></div>
     </div>
-    
     <div class="celebration" id="celebration">
         <div class="trophy">🏆</div>
         <h2>Ты чемпион!</h2>
         <p>Все дела выполнены! 🎉</p>
-        <a href="https://dela-semeynye.vercel.app/parent" class="btn" style="background: linear-gradient(135deg, #f59e0b, #f97316); color: white; border: none; max-width: 300px;">Далее →</a>
+        <a href="parent.html" class="btn" style="background: linear-gradient(135deg, #f59e0b, #f97316); color: white; border: none; max-width: 300px;">Далее →</a>
     </div>
-
     <script>
-        const emojiMap = {
-            'Убрать игрушки': '🧸', 'Сделать уроки': '📚', 'Выучить стих': '📝',
-            'Заправить кровать': '🛏️', 'Почистить зубы': '🪥', 'Одеться': '👕',
-            'Покушать': '🍽️', 'Помыть посуду': '🍽️', 'Полить цветы': '🌷',
-            'Покормить питомца': '🐾', 'Пропылесосить': '🧹', 'Помыть обувь': '👟'
-        };
-        
+        const emojiMap = { 'Убрать игрушки': '🧸', 'Сделать уроки': '📚', 'Выучить стих': '📝', 'Заправить кровать': '🛏️', 'Почистить зубы': '🪥', 'Одеться': '👕', 'Покушать': '🍽️', 'Помыть посуду': '🍽️', 'Полить цветы': '🌷', 'Покормить питомца': '🐾', 'Пропылесосить': '🧹', 'Помыть обувь': '👟' };
         let tasks = JSON.parse(localStorage.getItem('childTasks') || '[]');
         let completed = new Set(JSON.parse(localStorage.getItem('childCompleted') || '[]'));
-        
         function getEmoji(task) { return emojiMap[task] || '⭐'; }
-        
         function render() {
             const list = document.getElementById('taskList');
             const progress = document.getElementById('progress');
             list.innerHTML = '';
-            
-            if (tasks.length === 0) {
-                list.innerHTML = '<div style="text-align:center;padding:40px;color:#6b7280">Нет задач на сегодня</div>';
-                progress.textContent = '';
-                return;
-            }
-            
+            if (tasks.length === 0) { list.innerHTML = '<div style="text-align:center;padding:40px;color:#6b7280">Нет задач на сегодня</div>'; progress.textContent = ''; return; }
             tasks.forEach((task, i) => {
                 const done = completed.has(i);
                 const div = document.createElement('div');
@@ -75,21 +59,10 @@
                 div.innerHTML = '<div class="circle" onclick="toggleTask(' + i + ')">' + (done ? '✓' : '') + '</div><span class="emoji">' + getEmoji(task) + '</span><span class="text">' + task + '<span class="line"></span></span>';
                 list.appendChild(div);
             });
-            
             progress.textContent = 'Выполнено ' + completed.size + ' из ' + tasks.length;
-            
-            if (tasks.length > 0 && completed.size === tasks.length) {
-                document.getElementById('celebration').classList.add('show');
-            }
+            if (tasks.length > 0 && completed.size === tasks.length) { document.getElementById('celebration').classList.add('show'); }
         }
-        
-        function toggleTask(i) {
-            if (completed.has(i)) return;
-            completed.add(i);
-            localStorage.setItem('childCompleted', JSON.stringify([...completed]));
-            render();
-        }
-        
+        function toggleTask(i) { if (completed.has(i)) return; completed.add(i); localStorage.setItem('childCompleted', JSON.stringify([...completed])); render(); }
         render();
     </script>
 </body>
