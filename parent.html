@@ -25,20 +25,17 @@
         .custom-item .circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ec4899; background: #ec4899; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .custom-item .text { font-size: 14px; color: #1f2937; flex: 1; }
         .btn { display: inline-block; width: 100%; padding: 14px 24px; background: rgba(255,255,255,0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.4); border-radius: 12px; font-size: 16px; color: #374151; text-decoration: none; cursor: pointer; text-align: center; margin-top: 16px; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <div class="container" id="app">
         <h1>Совместные дела</h1>
         <p class="subtitle">Выберите дела из списка или добавьте свой вариант</p>
-        
         <div class="section">
             <div class="section-title">Примеры</div>
             <div class="example" onclick="toggleExample(0)"><div class="circle" id="ex0"></div><span class="text">Играть вместе</span></div>
             <div class="example" onclick="toggleExample(1)"><div class="circle" id="ex1"></div><span class="text">Сказка перед сном</span></div>
         </div>
-        
         <div class="section">
             <div class="section-title">Свой вариант</div>
             <div class="input-group">
@@ -47,15 +44,12 @@
             </div>
             <div id="customList"></div>
         </div>
-        
-        <a href="https://dela-semeynye.vercel.app/execute" class="btn" id="nextBtn" style="display:none">Далее →</a>
+        <a href="execute.html" class="btn" id="nextBtn" style="display:none">Далее →</a>
     </div>
-
     <script>
         const examples = ['Играть вместе', 'Сказка перед сном'];
         let selected = new Set(JSON.parse(localStorage.getItem('parentSelected') || '[]'));
         let custom = JSON.parse(localStorage.getItem('parentCustom') || '[]');
-        
         function render() {
             examples.forEach((_, i) => {
                 const circle = document.getElementById('ex' + i);
@@ -73,7 +67,6 @@
                     parent.classList.remove('selected');
                 }
             });
-            
             const list = document.getElementById('customList');
             list.innerHTML = '';
             custom.forEach((item, i) => {
@@ -82,18 +75,15 @@
                 div.innerHTML = '<div class="circle">✓</div><span class="text">' + item + '</span><button onclick="removeCustom(' + i + ')" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:18px">✕</button>';
                 list.appendChild(div);
             });
-            
             const total = selected.size + custom.length;
             document.getElementById('nextBtn').style.display = total > 0 ? 'block' : 'none';
         }
-        
         function toggleExample(i) {
             if (selected.has(i)) selected.delete(i);
             else if (selected.size + custom.length < 4) selected.add(i);
             localStorage.setItem('parentSelected', JSON.stringify([...selected]));
             render();
         }
-        
         function addCustom() {
             const input = document.getElementById('customInput');
             const val = input.value.trim();
@@ -103,15 +93,12 @@
             input.value = '';
             render();
         }
-        
         function removeCustom(i) {
             custom.splice(i, 1);
             localStorage.setItem('parentCustom', JSON.stringify(custom));
             render();
         }
-        
         render();
     </script>
 </body>
 </html>
- 
