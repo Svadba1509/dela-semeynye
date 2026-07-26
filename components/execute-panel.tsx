@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, Sparkles, ArrowRight } from "lucide-react";
 import { playTaskCompleteSound } from "@/lib/sounds";
 import { Button } from "@/components/ui/button";
+import { RewardCelebration } from "@/components/reward-celebration";
 
 const TASK_EMOJI: Record<string, string> = {
   "Убрать игрушки": "🧸",
@@ -22,7 +23,6 @@ const TASK_EMOJI: Record<string, string> = {
 };
 
 const FALLBACK_EMOJIS = ["⭐"];
-
 const STORAGE_KEY = "childTasks";
 
 interface Particle {
@@ -80,6 +80,7 @@ export function ExecutePanel() {
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [particles, setParticles] = useState<Particle[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showReward, setShowReward] = useState(false);
   const taskRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleComplete = useCallback(
@@ -105,6 +106,10 @@ export function ExecutePanel() {
   );
 
   const allDone = tasks.length > 0 && completed.size === tasks.length;
+
+  if (showReward) {
+    return <RewardCelebration />;
+  }
 
   if (tasks.length === 0) {
     return (
@@ -143,7 +148,7 @@ export function ExecutePanel() {
           <Button
             size="lg"
             className="w-full gap-2 text-base bg-gradient-to-r from-green-400 to-emerald-500 text-white hover:from-green-500 hover:to-emerald-600 shadow-lg border-0"
-            onClick={() => router.push("/celebration")}
+            onClick={() => setShowReward(true)}
           >
             Далее
             <ArrowRight className="h-4 w-4" />
