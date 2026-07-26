@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Дела семейные - Мои дела</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f0f4ff, #e8e0ff, #f5f0ff); min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 400px; width: 100%; padding-top: 40px; }
+        h1 { font-size: 24px; color: #1f2937; text-align: center; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; color: #6b7280; text-align: center; margin-bottom: 24px; }
+        .task { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 2px solid rgba(255,255,255,0.8); transition: all 0.3s; }
+        .task.done { background: rgba(220,252,231,0.6); border-color: #86efac; }
+        .task .circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: all 0.2s; background: white; }
+        .task .circle:hover { border-color: #818cf8; background: #eef2ff; }
+        .task.done .circle { border-color: #22c55e; background: #22c55e; color: white; transform: scale(1.1); }
+        .task .emoji { font-size: 24px; flex-shrink: 0; }
+        .task .text { font-size: 16px; color: #1f2937; flex: 1; word-break: break-word; min-width: 0; }
+        .task .text .line { display: block; height: 2px; background: #f87171; border-radius: 2px; margin-top: 4px; }
+        .task.done .text .line { background: #22c55e; }
+        .progress { text-align: center; font-size: 14px; color: #6b7280; margin-top: 16px; }
+        .btn { display: inline-block; width: 100%; padding: 14px 24px; background: rgba(255,255,255,0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.4); border-radius: 12px; font-size: 16px; color: #374151; text-decoration: none; cursor: pointer; text-align: center; margin-top: 16px; }
+        .celebration { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #1e1b4b, #581c87, #831843); flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .celebration.show { display: flex; }
+        .celebration .trophy { font-size: 80px; animation: bounce 2s infinite; }
+        .celebration h2 { color: #fbbf24; font-size: 28px; margin: 16px 0; }
+        .celebration p { color: white; font-size: 18px; margin-bottom: 24px; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>Мои дела</h1>
+        <p class="subtitle">Нажимай на кружок, когда выполнишь дело</p>
+        <div id="taskList"></div>
+        <div class="progress" id="progress"></div>
+    </div>
+    
+    <div class="celebration" id="celebration">
+        <div class="trophy">🏆</div>
+        <h2>Ты чемпион!</h2>
+        <p>Все дела выполнены! 🎉</p>
+        <a href="https://dela-semeynye.vercel.app/parent" class="btn" style="background: linear-gradient(135deg, #f59e0b, #f97316); color: white; border: none; max-width: 300px;">Далее →</a>
+    </div>
+
+    <script>
+        const emojiMap = {
+            'Убрать игрушки': '🧸', 'Сделать уроки': '📚', 'Выучить стих': '📝',
+            'Заправить кровать': '🛏️', 'Почистить зубы': '🪥', 'Одеться': '👕',
+            'Покушать': '🍽️', 'Помыть посуду': '🍽️', 'Полить цветы': '🌷',
+            'Покормить питомца': '🐾', 'Пропылесосить': '🧹', 'Помыть обувь': '👟'
+        };
+        
+        let tasks = JSON.parse(localStorage.getItem('childTasks') || '[]');
+        let completed = new Set(JSON.parse(localStorage.getItem('childCompleted') || '[]'));
+        
+        function getEmoji(task) { return emojiMap[task] || '⭐'; }
+        
+        function render() {
+            const list = document.getElementById('taskList');
+            const progress = document.getElementById('progress');
+            list.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                list.innerHTML = '<div style="text-align:center;padding:40px;color:#6b7280">Нет задач на сегодня</div>';
+                progress.textContent = '';
+                return;
+            }
+            
+            tasks.forEach((task, i) => {
+                const done = completed.has(i);
+                const div = document.createElement('div');
+                div.className = 'task' + (done ? ' done' : '');
+                div.innerHTML = '<div class="circle" onclick="toggleTask(' + i + ')">' + (done ? '✓' : '') + '</div><span class="emoji">' + getEmoji(task) + '</span><span class="text">' + task + '<span class="line"></span></span>';
+                list.appendChild(div);
+            });
+            
+            progress.textContent = 'Выполнено ' + completed.size + ' из ' + tasks.length;
+            
+            if (tasks.length > 0 && completed.size === tasks.length) {
+                document.getElementById('celebration').classList.add('show');
+            }
+        }
+        
+        function toggleTask(i) {
+            if (completed.has(i)) return;
+            completed.add(i);
+            localStorage.setItem('childCompleted', JSON.stringify([...completed]));
+            render();
+        }
+        
+        render();
+    </script>
+</body>
+</html>
