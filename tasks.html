@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Дела семейные - Задачи</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f0f4ff, #e8e0ff, #f5f0ff); min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 400px; width: 100%; padding-top: 40px; }
+        h1 { font-size: 24px; color: #1f2937; text-align: center; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; color: #6b7280; text-align: center; margin-bottom: 24px; }
+        .input-group { background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); border-radius: 16px; padding: 16px; margin-bottom: 16px; display: flex; gap: 8px; }
+        .input-group input { flex: 1; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; outline: none; }
+        .input-group input:focus { border-color: #818cf8; }
+        .input-group button { padding: 10px 16px; background: #818cf8; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; }
+        .task { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); border-radius: 12px; padding: 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.8); }
+        .task .circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #818cf8; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .task .circle.checked { background: #818cf8; color: white; }
+        .task .text { flex: 1; font-size: 14px; color: #1f2937; }
+        .btn { display: inline-block; width: 100%; padding: 14px 24px; background: rgba(255,255,255,0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.4); border-radius: 12px; font-size: 16px; color: #374151; text-decoration: none; cursor: pointer; text-align: center; margin-top: 16px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>Дела ребёнка на сегодня</h1>
+        <p class="subtitle">Добавьте задание для ребенка и нажмите +</p>
+        
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Введите дело..." maxlength="50">
+            <button onclick="addTask()">+</button>
+        </div>
+        
+        <div id="taskList"></div>
+        
+        <a href="https://dela-semeynye.vercel.app/rewards" class="btn" id="nextBtn" style="display:none">Далее →</a>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('childTasks') || '[]');
+        
+        function render() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            tasks.forEach((task, i) => {
+                const div = document.createElement('div');
+                div.className = 'task';
+                div.innerHTML = '<div class="circle checked">✓</div><span class="text">' + task + '</span><button onclick="removeTask(' + i + ')" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:18px">✕</button>';
+                list.appendChild(div);
+            });
+            document.getElementById('nextBtn').style.display = tasks.length > 0 ? 'block' : 'none';
+        }
+        
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const val = input.value.trim();
+            if (!val || tasks.length >= 4) return;
+            tasks.push(val);
+            localStorage.setItem('childTasks', JSON.stringify(tasks));
+            input.value = '';
+            render();
+        }
+        
+        function removeTask(i) {
+            tasks.splice(i, 1);
+            localStorage.setItem('childTasks', JSON.stringify(tasks));
+            render();
+        }
+        
+        render();
+    </script>
+</body>
+</html>
